@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+
+import string
+import sys
+
+secret = 'b8ea8eba3a88ae8ee8aa28bbb8eb8ba8ee3a3bb8bba3bae2e8a8e2b8ab8bb8eae3aee3ba80'
+secret = [int(secret[i:i+2],16) for i in range(0, len(secret), 2)]
+
+matrix = '08000000000000000c000000080000000e000000140000000a00000022000000040000002c0000000c000000300000000c0000003c0000000a00000048000000060000005200000010000000580000000c000000680000000c000000740000000a00000080000000080000008a0000000e000000920000000e000000a000000010000000ae0000000a000000be00000008000000c800000006000000d00000000a000000d60000000c000000e00000000c000000ec0000000e000000f800000010000000060100000e000000160100000400000024010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+matrix = [int(matrix[i:i+2],16) for i in range(0, len(matrix), 2)]
+
+def getValue(res):
+    var2 = res
+    if res < 0:
+        var2 = res + 7
+    var1 = res >> 0x37
+    return secret[var2 >> 3] >> (7 - ((res + (var1 >> 5) & 7) - (var1 >> 5)) & 0x1f) & 1
+
+def lower(c):
+    if chr(c) not in string.ascii_lowercase:
+        c = c + 0x20
+    return c
+
+
+#flag = 'encodedgxmurhtuou' + c0 + c1
+output = ''
+tailles = []
+charset = string.ascii_lowercase + ' '
+for c0 in charset:
+    for c1 in charset:
+        flag = c0 + c1
+        output = ''
+        for c in flag.encode():
+            c = lower(c)
+            if c == b' ':
+                c = b'{'
+            res1 = matrix[(c - 0x61) * 8 + 4]
+            
+            res2 = res1 + matrix[(c - 0x61)*8]
+            if res2-res1 not in tailles:
+                tailles.append(res2-res1)
+            
+            while res1 < res2:
+                output += str(getValue(res1))
+                res1 += 1
+        r = '10001110100011101011101000111011101110001110101000100011101010001110111010001110101011100011101110001010111000101110100010101010001110001010111000111011101110001010111000000000'
+        equal = int(sys.argv[1])
+        if output[:equal] == r[:equal]:
+            print(flag)
+
+output = [output[i:i+8] for i in range(0, len(output), 8)]
+print(output)

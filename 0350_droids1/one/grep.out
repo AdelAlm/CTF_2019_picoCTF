@@ -1,0 +1,4 @@
+./res/values/public.xml:    <public type="string" name="password" id="0x7f0b002f" />
+./res/values/strings.xml:    <string name="password">opossum</string>
+
+give opossum to app and get picoCTF{pining.for.the.fjords}
